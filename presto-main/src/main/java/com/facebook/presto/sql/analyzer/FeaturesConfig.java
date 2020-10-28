@@ -178,6 +178,8 @@ public class FeaturesConfig
 
     private PartitioningPrecisionStrategy partitioningPrecisionStrategy = PartitioningPrecisionStrategy.AUTOMATIC;
 
+    private boolean useResourceAwareScheduling;
+
     public enum PartitioningPrecisionStrategy
     {
         // Let Presto decide when to repartition
@@ -1391,6 +1393,18 @@ public class FeaturesConfig
     public FeaturesConfig setUseLegacyScheduler(boolean useLegacyScheduler)
     {
         this.useLegacyScheduler = useLegacyScheduler;
+        return this;
+    }
+
+    public boolean isUseResourceAwareScheduling()
+    {
+        return useResourceAwareScheduling;
+    }
+
+    @Config("use-resource-aware-scheduling")
+    public FeaturesConfig setUseResourceAwareScheduling(boolean useResourceAwareScheduling)
+    {
+        this.useResourceAwareScheduling = useResourceAwareScheduling;
         return this;
     }
 

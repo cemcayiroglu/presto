@@ -170,6 +170,7 @@ public final class SystemSessionProperties
     public static final String INLINE_SQL_FUNCTIONS = "inline_sql_functions";
     public static final String REMOTE_FUNCTIONS_ENABLED = "remote_functions_enabled";
     public static final String CHECK_ACCESS_CONTROL_ON_UTILIZED_COLUMNS_ONLY = "check_access_control_on_utilized_columns_only";
+    public static final String USE_RESOURCE_AWARE_SCHEDULING = "use_resource_aware_scheduling";
     public static final String SKIP_REDUNDANT_SORT = "skip_redundant_sort";
     public static final String ALLOW_WINDOW_ORDER_BY_LITERALS = "allow_window_order_by_literals";
 
@@ -806,6 +807,11 @@ public final class SystemSessionProperties
                         USE_LEGACY_SCHEDULER,
                         "Use version of scheduler before refactorings for section retries",
                         featuresConfig.isUseLegacyScheduler(),
+                        false),
+                booleanProperty(
+                        USE_RESOURCE_AWARE_SCHEDULING,
+                        "Use resource aware scheduling",
+                        featuresConfig.isUseResourceAwareScheduling(),
                         false),
                 booleanProperty(
                         OPTIMIZE_COMMON_SUB_EXPRESSIONS,
@@ -1451,6 +1457,11 @@ public final class SystemSessionProperties
     public static boolean isUseLegacyScheduler(Session session)
     {
         return session.getSystemProperty(USE_LEGACY_SCHEDULER, Boolean.class);
+    }
+
+    public static boolean isUseResourceAwareScheduling(Session session)
+    {
+        return session.getSystemProperty(USE_RESOURCE_AWARE_SCHEDULING, Boolean.class);
     }
 
     public static boolean isOptimizeCommonSubExpressions(Session session)

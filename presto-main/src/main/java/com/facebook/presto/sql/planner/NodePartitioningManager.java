@@ -47,6 +47,7 @@ import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
 import static com.facebook.presto.SystemSessionProperties.getMaxTasksPerStage;
+import static com.facebook.presto.SystemSessionProperties.isUseResourceAwareScheduling;
 import static com.facebook.presto.spi.StandardErrorCode.NODE_SELECTION_NOT_SUPPORTED;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
@@ -127,6 +128,7 @@ public class NodePartitioningManager
 
         List<InternalNode> bucketToNode;
         NodeSelectionStrategy nodeSelectionStrategy = connectorBucketNodeMap.getNodeSelectionStrategy();
+        boolean useResourceAwareScheduling = isUseResourceAwareScheduling(session);
         boolean cacheable;
         switch (nodeSelectionStrategy) {
             case HARD_AFFINITY:
@@ -139,7 +141,7 @@ public class NodePartitioningManager
                 break;
             case NO_PREFERENCE:
                 bucketToNode = createArbitraryBucketToNode(
-                        nodeScheduler.createNodeSelector(connectorId).selectRandomNodes(getMaxTasksPerStage(session)),
+                        nodeScheduler.createNodeSelector(connectorId, useResourceAwareScheduling).selectRandomNodes(getMaxTasksPerStage(session)),
                         connectorBucketNodeMap.getBucketCount());
                 cacheable = false;
                 break;
@@ -172,6 +174,7 @@ public class NodePartitioningManager
         ConnectorBucketNodeMap connectorBucketNodeMap = getConnectorBucketNodeMap(session, partitioningHandle);
 
         NodeSelectionStrategy nodeSelectionStrategy = connectorBucketNodeMap.getNodeSelectionStrategy();
+        boolean useResourceAwareScheduling = isUseResourceAwareScheduling(session);
         switch (nodeSelectionStrategy) {
             case HARD_AFFINITY:
                 return new FixedBucketNodeMap(getSplitToBucket(session, partitioningHandle), getFixedMapping(connectorBucketNodeMap), false);
@@ -187,7 +190,7 @@ public class NodePartitioningManager
                 return new FixedBucketNodeMap(
                         getSplitToBucket(session, partitioningHandle),
                         createArbitraryBucketToNode(
-                                nodeScheduler.createNodeSelector(partitioningHandle.getConnectorId().get()).selectRandomNodes(getMaxTasksPerStage(session)),
+                                nodeScheduler.createNodeSelector(partitioningHandle.getConnectorId().get(), useResourceAwareScheduling).selectRandomNodes(getMaxTasksPerStage(session)),
                                 connectorBucketNodeMap.getBucketCount()),
                         false);
             default:
